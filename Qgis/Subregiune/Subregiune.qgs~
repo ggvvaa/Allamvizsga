@@ -5,7 +5,7 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::PartiallyChecked" name="">
     <customproperties/>
-    <layer-tree-layer expanded="1" checked="Qt::Checked" id="transdiptera20170309201856310" name="transdiptera">
+    <layer-tree-layer expanded="1" checked="Qt::Checked" id="gyujtesi_pontok20170310120256855" name="gyujtesi_pontok">
       <customproperties/>
     </layer-tree-layer>
     <layer-tree-layer expanded="0" checked="Qt::Unchecked" id="Romania20170306172150213" name="Romania">
@@ -22,10 +22,10 @@
   <mapcanvas>
     <units>degrees</units>
     <extent>
-      <xmin>20.05565662921569015</xmin>
-      <ymin>43.00947495703358214</ymin>
-      <xmax>29.98654938643844048</xmax>
-      <ymax>49.01397193284717702</ymax>
+      <xmin>19.15776545399839037</xmin>
+      <ymin>43.40973969779308561</ymin>
+      <xmax>29.08865821122114781</xmax>
+      <ymax>49.41423667360668048</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
@@ -46,6 +46,7 @@
       <layer_coordinate_transform destAuthId="EPSG:4326" srcAuthId="EPSG:4326" srcDatumTransform="-1" destDatumTransform="-1" layerid="transdiptera20170309201856310"/>
       <layer_coordinate_transform destAuthId="EPSG:4326" srcAuthId="EPSG:4326" srcDatumTransform="-1" destDatumTransform="-1" layerid="Regiune20170306170748302"/>
       <layer_coordinate_transform destAuthId="EPSG:4326" srcAuthId="EPSG:4326" srcDatumTransform="-1" destDatumTransform="-1" layerid="Subregiune20170307163549703"/>
+      <layer_coordinate_transform destAuthId="EPSG:4326" srcAuthId="EPSG:4326" srcDatumTransform="-1" destDatumTransform="-1" layerid="gyujtesi_pontok20170310120256855"/>
       <layer_coordinate_transform destAuthId="EPSG:4326" srcAuthId="EPSG:4326" srcDatumTransform="-1" destDatumTransform="-1" layerid="Subregiune20170304160800455"/>
       <layer_coordinate_transform destAuthId="EPSG:4326" srcAuthId="EPSG:4326" srcDatumTransform="-1" destDatumTransform="-1" layerid="Romania20170306172150213"/>
     </layer_coordinate_transform_info>
@@ -55,13 +56,13 @@
       <item>Regiune20170306170748302</item>
       <item>Romania20170306172150213</item>
       <item>Subregiune20170307163549703</item>
-      <item>transdiptera20170309201856310</item>
+      <item>gyujtesi_pontok20170310120256855</item>
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="transdiptera" showFeatureCount="0">
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="gyujtesi_pontok" showFeatureCount="0">
       <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="transdiptera20170309201856310" visible="1"/>
+        <legendlayerfile isInOverview="0" layerid="gyujtesi_pontok20170310120256855" visible="1"/>
       </filegroup>
     </legendlayer>
     <legendlayer drawingOrder="-1" open="false" checked="Qt::Unchecked" name="Romania" showFeatureCount="0">
@@ -1960,12 +1961,12 @@ def my_form_open(dialog, layer, feature):
       </defaults>
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
-      <id>transdiptera20170309201856310</id>
-      <datasource>dbname='gisdata' host=openbiomaps.org port=5432 user='transdiptera_admin' password='c38qjyrs3gmxu4x67kt7kqpvi' sslmode=disable key='obm_id' srid=4326 type=Point table="public"."transdiptera" (obm_geometry) sql=</datasource>
+      <id>gyujtesi_pontok20170310120256855</id>
+      <datasource>./gyujtesi_pontok.shp</datasource>
       <keywordList>
         <value></value>
       </keywordList>
-      <layername>transdiptera</layername>
+      <layername>gyujtesi_pontok</layername>
       <srs>
         <spatialrefsys>
           <proj4>+proj=longlat +datum=WGS84 +no_defs</proj4>
@@ -1978,7 +1979,7 @@ def my_form_open(dialog, layer, feature):
           <geographicflag>true</geographicflag>
         </spatialrefsys>
       </srs>
-      <provider encoding="UTF-8">postgres</provider>
+      <provider encoding="UTF-8">ogr</provider>
       <previewExpression>COALESCE( "obm_id", '&lt;NULL>' )</previewExpression>
       <vectorjoins/>
       <layerDependencies/>
@@ -1993,19 +1994,19 @@ def my_form_open(dialog, layer, feature):
         <edittype widgetv2type="TextEdit" name="obm_datum">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="obm_uploading_id">
+        <edittype widgetv2type="TextEdit" name="obm_upload">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="obm_validation">
+        <edittype widgetv2type="TextEdit" name="obm_valida">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="obm_comments">
+        <edittype widgetv2type="TextEdit" name="obm_commen">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="obm_modifier_id">
+        <edittype widgetv2type="TextEdit" name="obm_modifi">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="obm_files_id">
+        <edittype widgetv2type="TextEdit" name="obm_files_">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
         <edittype widgetv2type="TextEdit" name="family">
@@ -2038,7 +2039,7 @@ def my_form_open(dialog, layer, feature):
         <edittype widgetv2type="TextEdit" name="females">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="collection_date">
+        <edittype widgetv2type="TextEdit" name="collection">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
         <edittype widgetv2type="TextEdit" name="country">
@@ -2050,10 +2051,10 @@ def my_form_open(dialog, layer, feature):
         <edittype widgetv2type="TextEdit" name="location">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="geographic_unit">
+        <edittype widgetv2type="TextEdit" name="geographic">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="exact_location">
+        <edittype widgetv2type="TextEdit" name="exact_loca">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
         <edittype widgetv2type="TextEdit" name="elevation">
@@ -2068,7 +2069,7 @@ def my_form_open(dialog, layer, feature):
         <edittype widgetv2type="TextEdit" name="collectors">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
-        <edittype widgetv2type="TextEdit" name="determined_by">
+        <edittype widgetv2type="TextEdit" name="determined">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
         <edittype widgetv2type="TextEdit" name="species_id">
@@ -2141,7 +2142,7 @@ def my_form_open(dialog, layer, feature):
         <property key="labeling/fitInPolygonOnly" value="false"/>
         <property key="labeling/fontCapitals" value="0"/>
         <property key="labeling/fontFamily" value="Ubuntu"/>
-        <property key="labeling/fontItalic" value="true"/>
+        <property key="labeling/fontItalic" value="false"/>
         <property key="labeling/fontLetterSpacing" value="0"/>
         <property key="labeling/fontLimitPixelSize" value="false"/>
         <property key="labeling/fontMaxPixelSize" value="10000"/>
@@ -2151,7 +2152,7 @@ def my_form_open(dialog, layer, feature):
         <property key="labeling/fontSizeMapUnitScale" value="0,0,0,0,0,0"/>
         <property key="labeling/fontStrikeout" value="false"/>
         <property key="labeling/fontUnderline" value="false"/>
-        <property key="labeling/fontWeight" value="63"/>
+        <property key="labeling/fontWeight" value="50"/>
         <property key="labeling/fontWordSpacing" value="0"/>
         <property key="labeling/formatNumbers" value="false"/>
         <property key="labeling/isExpression" value="true"/>
@@ -2310,11 +2311,11 @@ def my_form_open(dialog, layer, feature):
       <aliases>
         <alias field="obm_id" index="0" name=""/>
         <alias field="obm_datum" index="1" name=""/>
-        <alias field="obm_uploading_id" index="2" name=""/>
-        <alias field="obm_validation" index="3" name=""/>
-        <alias field="obm_comments" index="4" name=""/>
-        <alias field="obm_modifier_id" index="5" name=""/>
-        <alias field="obm_files_id" index="6" name=""/>
+        <alias field="obm_upload" index="2" name=""/>
+        <alias field="obm_valida" index="3" name=""/>
+        <alias field="obm_commen" index="4" name=""/>
+        <alias field="obm_modifi" index="5" name=""/>
+        <alias field="obm_files_" index="6" name=""/>
         <alias field="family" index="7" name=""/>
         <alias field="subfamily" index="8" name=""/>
         <alias field="genera" index="9" name=""/>
@@ -2325,17 +2326,17 @@ def my_form_open(dialog, layer, feature):
         <alias field="population" index="14" name=""/>
         <alias field="males" index="15" name=""/>
         <alias field="females" index="16" name=""/>
-        <alias field="collection_date" index="17" name=""/>
+        <alias field="collection" index="17" name=""/>
         <alias field="country" index="18" name=""/>
         <alias field="county" index="19" name=""/>
         <alias field="location" index="20" name=""/>
-        <alias field="geographic_unit" index="21" name=""/>
-        <alias field="exact_location" index="22" name=""/>
+        <alias field="geographic" index="21" name=""/>
+        <alias field="exact_loca" index="22" name=""/>
         <alias field="elevation" index="23" name=""/>
         <alias field="latitude" index="24" name=""/>
         <alias field="longitude" index="25" name=""/>
         <alias field="collectors" index="26" name=""/>
-        <alias field="determined_by" index="27" name=""/>
+        <alias field="determined" index="27" name=""/>
         <alias field="species_id" index="28" name=""/>
         <alias field="pupae" index="29" name=""/>
         <alias field="larvae" index="30" name=""/>
@@ -2343,39 +2344,39 @@ def my_form_open(dialog, layer, feature):
       <excludeAttributesWMS/>
       <excludeAttributesWFS/>
       <attributeactions default="-1"/>
-      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="-562364416">
+      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="&quot;obm_id&quot;" sortOrder="0">
         <columns>
           <column width="-1" hidden="0" type="field" name="obm_id"/>
-          <column width="-1" hidden="0" type="field" name="obm_datum"/>
-          <column width="-1" hidden="0" type="field" name="obm_uploading_id"/>
-          <column width="-1" hidden="0" type="field" name="obm_validation"/>
-          <column width="-1" hidden="0" type="field" name="obm_comments"/>
-          <column width="-1" hidden="0" type="field" name="obm_modifier_id"/>
-          <column width="-1" hidden="0" type="field" name="obm_files_id"/>
-          <column width="-1" hidden="0" type="field" name="family"/>
-          <column width="-1" hidden="0" type="field" name="subfamily"/>
-          <column width="-1" hidden="0" type="field" name="genera"/>
-          <column width="-1" hidden="0" type="field" name="subgenera"/>
-          <column width="-1" hidden="0" type="field" name="species"/>
-          <column width="-1" hidden="0" type="field" name="subspecies"/>
-          <column width="-1" hidden="0" type="field" name="author"/>
-          <column width="-1" hidden="0" type="field" name="population"/>
-          <column width="-1" hidden="0" type="field" name="males"/>
-          <column width="-1" hidden="0" type="field" name="females"/>
-          <column width="-1" hidden="0" type="field" name="collection_date"/>
-          <column width="-1" hidden="0" type="field" name="country"/>
-          <column width="-1" hidden="0" type="field" name="county"/>
-          <column width="-1" hidden="0" type="field" name="location"/>
-          <column width="-1" hidden="0" type="field" name="geographic_unit"/>
-          <column width="-1" hidden="0" type="field" name="exact_location"/>
-          <column width="-1" hidden="0" type="field" name="elevation"/>
-          <column width="-1" hidden="0" type="field" name="latitude"/>
-          <column width="-1" hidden="0" type="field" name="longitude"/>
-          <column width="-1" hidden="0" type="field" name="collectors"/>
-          <column width="-1" hidden="0" type="field" name="determined_by"/>
-          <column width="-1" hidden="0" type="field" name="species_id"/>
-          <column width="-1" hidden="0" type="field" name="pupae"/>
-          <column width="-1" hidden="0" type="field" name="larvae"/>
+          <column width="122" hidden="0" type="field" name="obm_datum"/>
+          <column width="126" hidden="0" type="field" name="obm_upload"/>
+          <column width="120" hidden="0" type="field" name="obm_valida"/>
+          <column width="136" hidden="0" type="field" name="obm_commen"/>
+          <column width="122" hidden="0" type="field" name="obm_modifi"/>
+          <column width="116" hidden="0" type="field" name="obm_files_"/>
+          <column width="84" hidden="0" type="field" name="family"/>
+          <column width="109" hidden="0" type="field" name="subfamily"/>
+          <column width="88" hidden="0" type="field" name="genera"/>
+          <column width="113" hidden="0" type="field" name="subgenera"/>
+          <column width="91" hidden="0" type="field" name="species"/>
+          <column width="117" hidden="0" type="field" name="subspecies"/>
+          <column width="88" hidden="0" type="field" name="author"/>
+          <column width="115" hidden="0" type="field" name="population"/>
+          <column width="162" hidden="0" type="field" name="males"/>
+          <column width="153" hidden="0" type="field" name="females"/>
+          <column width="109" hidden="0" type="field" name="collection"/>
+          <column width="95" hidden="0" type="field" name="country"/>
+          <column width="89" hidden="0" type="field" name="county"/>
+          <column width="128" hidden="0" type="field" name="location"/>
+          <column width="119" hidden="0" type="field" name="geographic"/>
+          <column width="246" hidden="0" type="field" name="exact_loca"/>
+          <column width="179" hidden="0" type="field" name="elevation"/>
+          <column width="162" hidden="0" type="field" name="latitude"/>
+          <column width="162" hidden="0" type="field" name="longitude"/>
+          <column width="165" hidden="0" type="field" name="collectors"/>
+          <column width="165" hidden="0" type="field" name="determined"/>
+          <column width="112" hidden="0" type="field" name="species_id"/>
+          <column width="153" hidden="0" type="field" name="pupae"/>
+          <column width="153" hidden="0" type="field" name="larvae"/>
           <column width="-1" hidden="1" type="actions"/>
         </columns>
       </attributetableconfig>
@@ -2410,11 +2411,11 @@ def my_form_open(dialog, layer, feature):
       <defaults>
         <default field="obm_id" expression=""/>
         <default field="obm_datum" expression=""/>
-        <default field="obm_uploading_id" expression=""/>
-        <default field="obm_validation" expression=""/>
-        <default field="obm_comments" expression=""/>
-        <default field="obm_modifier_id" expression=""/>
-        <default field="obm_files_id" expression=""/>
+        <default field="obm_upload" expression=""/>
+        <default field="obm_valida" expression=""/>
+        <default field="obm_commen" expression=""/>
+        <default field="obm_modifi" expression=""/>
+        <default field="obm_files_" expression=""/>
         <default field="family" expression=""/>
         <default field="subfamily" expression=""/>
         <default field="genera" expression=""/>
@@ -2425,17 +2426,17 @@ def my_form_open(dialog, layer, feature):
         <default field="population" expression=""/>
         <default field="males" expression=""/>
         <default field="females" expression=""/>
-        <default field="collection_date" expression=""/>
+        <default field="collection" expression=""/>
         <default field="country" expression=""/>
         <default field="county" expression=""/>
         <default field="location" expression=""/>
-        <default field="geographic_unit" expression=""/>
-        <default field="exact_location" expression=""/>
+        <default field="geographic" expression=""/>
+        <default field="exact_loca" expression=""/>
         <default field="elevation" expression=""/>
         <default field="latitude" expression=""/>
         <default field="longitude" expression=""/>
         <default field="collectors" expression=""/>
-        <default field="determined_by" expression=""/>
+        <default field="determined" expression=""/>
         <default field="species_id" expression=""/>
         <default field="pupae" expression=""/>
         <default field="larvae" expression=""/>
@@ -2496,8 +2497,12 @@ def my_form_open(dialog, layer, feature):
       <LayerSnappingList type="QStringList">
         <value>Regiune20170306170748302</value>
         <value>Romania20170306172150213</value>
+        <value>Subregiune20170307163549703</value>
+        <value>gyujtesi_pontok20170310120256855</value>
       </LayerSnappingList>
       <LayerSnappingEnabledList type="QStringList">
+        <value>disabled</value>
+        <value>disabled</value>
         <value>disabled</value>
         <value>disabled</value>
       </LayerSnappingEnabledList>
@@ -2506,14 +2511,20 @@ def my_form_open(dialog, layer, feature):
       <LayerSnappingToleranceUnitList type="QStringList">
         <value>2</value>
         <value>2</value>
+        <value>2</value>
+        <value>2</value>
       </LayerSnappingToleranceUnitList>
       <LayerSnapToList type="QStringList">
+        <value>to_vertex_and_segment</value>
+        <value>to_vertex_and_segment</value>
         <value>to_vertex_and_segment</value>
         <value>to_vertex_and_segment</value>
       </LayerSnapToList>
       <DefaultSnapType type="QString">off</DefaultSnapType>
       <DefaultSnapTolerance type="double">0</DefaultSnapTolerance>
       <LayerSnappingToleranceList type="QStringList">
+        <value>0.000000</value>
+        <value>0.000000</value>
         <value>0.000000</value>
         <value>0.000000</value>
       </LayerSnappingToleranceList>
