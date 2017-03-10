@@ -5,7 +5,7 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::PartiallyChecked" name="">
     <customproperties/>
-    <layer-tree-layer expanded="1" checked="Qt::Unchecked" id="gyujtesi_pontok20170310120256855" name="gyujtesi_pontok">
+    <layer-tree-layer expanded="1" checked="Qt::Checked" id="gyujtesi_pontok20170310120256855" name="gyujtesi_pontok">
       <customproperties/>
     </layer-tree-layer>
     <layer-tree-layer expanded="0" checked="Qt::Unchecked" id="Romania20170306172150213" name="Romania">
@@ -25,10 +25,10 @@
   <mapcanvas>
     <units>degrees</units>
     <extent>
-      <xmin>20.03402069728275237</xmin>
-      <ymin>42.12240174778272461</ymin>
-      <xmax>29.9649134545055098</xmax>
-      <ymax>48.12689872359631948</ymax>
+      <xmin>19.87175120778564974</xmin>
+      <ymin>42.11158378181625039</ymin>
+      <xmax>29.80264396500840718</xmax>
+      <ymax>48.11608075762984527</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
@@ -67,9 +67,9 @@
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Unchecked" name="gyujtesi_pontok" showFeatureCount="0">
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="gyujtesi_pontok" showFeatureCount="0">
       <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="gyujtesi_pontok20170310120256855" visible="0"/>
+        <legendlayerfile isInOverview="0" layerid="gyujtesi_pontok20170310120256855" visible="1"/>
       </filegroup>
     </legendlayer>
     <legendlayer drawingOrder="-1" open="false" checked="Qt::Unchecked" name="Romania" showFeatureCount="0">

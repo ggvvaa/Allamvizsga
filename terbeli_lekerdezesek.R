@@ -3,6 +3,7 @@ library(rgdal)
 library(rgdal)
 library(sp)
 library(readxl)
+library(maptools)
 library(rgdal)
 library(ggplot2)
 
@@ -84,4 +85,27 @@ dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, 
 
 # plot(regi)
 # points(dat$lat ~ dat$lon, col = "red")
-mp <- ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + geom_point(data=dat, aes(x=lon, y=lat), color='red')
+mp <- ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + geom_point(data=dat, aes(x=lon, y=lat), color='red',size=2)
+
+
+{
+  #nPolys <- sapply(regi@polygons, function(x)length(x@Polygons)) #megmondja hogy melyik polygon, hany reszbol all
+  regi_f <- fortify(regi)
+  nPolys <- unique(regi_f$id) #a kulombozo regioknak az azonositoi, osszesen 16
+  regi_fl = list()
+  nevek <- as.character(regi$DENUMIRE)
+  
+  
+  for (i in 1:length(nPolys)) {
+    new_shape_1 <- point.in.polygon(dat$lon, dat$lat, regi_f[regi_f$id == nPolys[i],]$long, regi_f[regi_f$id == nPolys[i],]$lat)
+    new_shape_2 <- numeric(0)
+    for (j in 1:length(new_shape_1)) {
+      if (new_shape_1[j] == 0) {
+        new_shape_2[length(new_shape_2) + 1] <- j
+      }
+    }
+    regi_fl[[i]] <- list(nevek[i], list(dat[-new_shape_2,]))
+  } 
+  #a regi_fl[[1]][[1]] tartalmazza a regio nevet, a regi_fl[[1]][[2]] tartalmazza a regioba talalhato pontokat
+  #rei_fl[[i]] az i edik regio informacioi (osszesen 16 van)
+} #regionkent lekerdezzuk a pontokat
