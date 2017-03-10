@@ -3,6 +3,8 @@ library(rgdal)
 library(rgdal)
 library(sp)
 library(readxl)
+library(rgdal)
+library(ggplot2)
 
 
 
@@ -80,9 +82,6 @@ dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, 
 
 
 
-plot(regi)
-points(dat$lat ~ dat$lon, col = "red")
-
-
-
-nevek <- regi@data$DENUMIRE
+# plot(regi)
+# points(dat$lat ~ dat$lon, col = "red")
+mp <- ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + geom_point(data=dat, aes(x=lon, y=lat), color='red')
