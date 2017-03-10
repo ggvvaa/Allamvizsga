@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(obm)\nlibrary(rgdal)\nlibrary(rgdal)\nlibrary(sp)\n\nOBM_init('transdiptera')\n#OBM_init('transdiptera','localhost/biomaps')\ntokeRn <- OBM_auth('veres_robi75@yahoo.com', '123456')\nt_data <- OBM_get('get_data', '*')\nt_data <- data.frame(t_data)\nt_data[, 2:15] <- NULL #kivesz egy par oszlopot\n\nla <- unlist(t_data$latitude)\nlo <- unlist(t_data$longitude)\nsp <- unlist(t_data$species_id)\n\ndat <- data.frame(lon = lo, lat = la, sp = sp)\n\nregi <- readOGR(\"/home/robi/Allamvizsga/Qgis/Regiune/Regiune.shp\", layer = \"Regiune\")\nplot(regi)\npoints(dat$lat ~ dat$lon, col = \"red\")\n\ncoordinates(dat) <- ~lon + lat #spatial point  dataframe\nproj4string(dat) <- proj4string(regi) #atalakitas???\n\nnew_shape <- point.in.polygon(dat$lon[4], dat$lat[4], regi@polygons[[3]]@Polygons[[1]]@coords[,1], regi@polygons[[3]]@Polygons[[1]]@coords[,2])\n\n#regi@polygons[[1]]@Polygons[[2]]@coords[,1]\n\nnevek <- regi@data$DENUMIRE",
+    "created" : 1489143251148.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3285121728",
+    "id" : "C8C3605A",
+    "lastKnownWriteTime" : 1489143303,
+    "last_content_update" : 1489143303019,
+    "path" : "~/Allamvizsga/terbeli_lekerdezesek.R",
+    "project_path" : "terbeli_lekerdezesek.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
