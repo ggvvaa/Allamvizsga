@@ -1,6 +1,7 @@
 library(obm)
 library(rgdal)
 library(rgdal)
+library(rgeos)
 library(sp)
 library(readxl)
 library(maptools)
@@ -85,7 +86,8 @@ dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, 
 
 # plot(regi)
 # points(dat$lat ~ dat$lon, col = "red")
-mp <- ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + geom_point(data=dat, aes(x=lon, y=lat), color='red',size=2)
+ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + geom_point(data=dat, aes(x=lon, y=lat), color='red',size=2)
+
 
 
 {
@@ -104,8 +106,58 @@ mp <- ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='
         new_shape_2[length(new_shape_2) + 1] <- j
       }
     }
-    regi_fl[[i]] <- list(nevek[i], list(dat[-new_shape_2,]))
+    regi_fl[[i]] <- list(nevek[i], dat[-new_shape_2,])
   } 
   #a regi_fl[[1]][[1]] tartalmazza a regio nevet, a regi_fl[[1]][[2]] tartalmazza a regioba talalhato pontokat
   #rei_fl[[i]] az i edik regio informacioi (osszesen 16 van)
+  #pl: regi_fl[[2]][[2]][1,] parancsal lehet elerni a masodik listaba levo data frame elemeit
 } #regionkent lekerdezzuk a pontokat
+
+
+  
+for (i in 1:length(regi_fl)) {
+  print(
+    ggplot() + geom_polygon(
+      data = regi,
+      aes(long, lat, group = group),
+      colour = 'black',
+      fill = 'white'
+    ) + geom_point(
+      data = regi_fl[[i]][[2]],
+      aes(x = lon, y = lat),
+      color = 'red',
+      size = 2
+    ) + ggtitle(regi_fl[[i]][[1]])
+  )
+} #pontok regionkent
+
+
+
+{
+  centroids <- data.frame(gCentroid(regi, byid = TRUE))
+  centroids$regiune <- regi$REGIUNE
+  s <-
+    c(
+      'podis' ,
+      'campie',
+      'carpati',
+      'depresiune',
+      'dealuri',
+      'carpati',
+      'dealuri',
+      'carpati',
+      'carpati',
+      'carpati',
+      'dealuri',
+      'campie',
+      'podis',
+      'podis',
+      'campie',
+      'carpati'
+    )
+  ggplot(data = centroids, aes(
+    x = x,
+    y = y,
+    label = centroids$regiune
+  )) + geom_point() + geom_text(vjust = 0, nudge_y = 0.1, aes(colour = factor(s)))
+} #regionkenti centroidok meghatarozasa + kategorizalas
