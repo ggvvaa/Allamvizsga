@@ -20,7 +20,7 @@
     <layer-tree-layer expanded="1" checked="Qt::Checked" id="Centroids20170311150315268" name="Centroids">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" checked="Qt::Checked" id="Regiune20170306170748302" name="Regiune">
+    <layer-tree-layer expanded="0" checked="Qt::Checked" id="Regiune20170306170748302" name="Regiune">
       <customproperties/>
     </layer-tree-layer>
   </layer-tree-group>
@@ -28,10 +28,10 @@
   <mapcanvas>
     <units>degrees</units>
     <extent>
-      <xmin>20.1217979265106699</xmin>
-      <ymin>42.04664429428068217</ymin>
-      <xmax>30.05269068373808139</xmax>
-      <ymax>48.05114127009711922</ymax>
+      <xmin>19.93311096412335104</xmin>
+      <ymin>42.09629875806682264</ymin>
+      <xmax>29.86400372135076253</xmax>
+      <ymax>48.10079573388325969</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
@@ -97,8 +97,8 @@
         <legendlayerfile isInOverview="0" layerid="Centroids20170311150315268" visible="1"/>
       </filegroup>
     </legendlayer>
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="Regiune" showFeatureCount="0">
-      <filegroup open="true" hidden="false">
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Checked" name="Regiune" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
         <legendlayerfile isInOverview="0" layerid="Regiune20170306170748302" visible="1"/>
       </filegroup>
     </legendlayer>
@@ -215,7 +215,7 @@
         <multilineenabled fieldname="" on=""/>
         <selectedonly on=""/>
       </labelattributes>
-      <annotationform></annotationform>
+      <annotationform>.</annotationform>
       <aliases>
         <alias field="ID" index="0" name=""/>
         <alias field="REGIUNE" index="1" name=""/>
@@ -244,10 +244,10 @@
           <column width="-1" hidden="1" type="actions"/>
         </columns>
       </attributetableconfig>
-      <editform></editform>
+      <editform>.</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath></editforminitfilepath>
+      <editforminitfilepath>.</editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
       <featformsuppress>0</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>

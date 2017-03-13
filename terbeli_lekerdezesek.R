@@ -10,6 +10,8 @@ library(ggplot2)
 
 
 
+#1
+{
 OBM_init('transdiptera')
 tokeRn <- OBM_auth('veres_robi75@yahoo.com', '123456')
 t_data <- OBM_get('get_data', '*')
@@ -28,10 +30,12 @@ id <- unlist(t_data$obm_id)
 la <- unlist(t_data$latitude)
 lo <- unlist(t_data$longitude)
 sp <- unlist(t_data$species_id)
-dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, subgen = NA, spec = NA, subspec = NA, sp = sp)
+dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, subgen = NA, spec = NA, subspec = NA, auth = NA, sp = sp)
+} #kiindulasi adatok lekerdezese
 
 
 
+#2
 {
   a <- numeric(0)
   for (i in 1:length(dat$sp)) {
@@ -43,6 +47,7 @@ dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, 
       dat[i, ]$subgen <- tipuloidae[x, ]$subgenera
       dat[i, ]$spec <- tipuloidae[x, ]$species
       dat[i, ]$subspec <- tipuloidae[x, ]$subspecies
+      dat[i, ]$auth <- tipuloidae[x, ]$author
     } else {
       a[length(a) + 1] <- i
     }
@@ -62,6 +67,8 @@ dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, 
 #regi@polygons[[1]]@Polygons[[2]]@coords[,1]
 
 
+
+#3
 {
   new_shape_1 <-
     point.in.polygon(
@@ -90,12 +97,15 @@ ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black'
 
 
 
+
+#4
 {
   #nPolys <- sapply(regi@polygons, function(x)length(x@Polygons)) #megmondja hogy melyik polygon, hany reszbol all
   regi_f <- fortify(regi)
   nPolys <- unique(regi_f$id) #a kulombozo regioknak az azonositoi, osszesen 16
   regi_fl = list()
   nevek <- as.character(regi$DENUMIRE)
+  
   
   
   for (i in 1:length(nPolys)) {
@@ -106,33 +116,35 @@ ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black'
         new_shape_2[length(new_shape_2) + 1] <- j
       }
     }
-    regi_fl[[i]] <- list(nevek[i], dat[-new_shape_2,])
+    fajok = dat[-new_shape_2,]
+    corr = length(unique(fajok$sp))/(regi$Terulet[i]/1000) #a terulet milyen formaba szerepeljen?
+    regi_fl[[i]] <- list(adatok = data.frame(nev = nevek[i], terulet = regi$Terulet[i], corr = corr), fajok = fajok)
   } 
   #a regi_fl[[1]][[1]] tartalmazza a regio nevet, a regi_fl[[1]][[2]] tartalmazza a regioba talalhato pontokat
   #rei_fl[[i]] az i edik regio informacioi (osszesen 16 van)
   #pl: regi_fl[[2]][[2]][1,] parancsal lehet elerni a masodik listaba levo data frame elemeit
+  
+  
+  
+  unlist(lapply(regi_fl, function(x) {lapply(x$adatok$corr, identity)})) #visszateriti a corr erteket az osszes eruletrol
 } #regionkent lekerdezzuk a pontokat
 
 
   
 for (i in 1:length(regi_fl)) {
   print(
-    ggplot() + geom_polygon(
-      data = regi,
-      aes(long, lat, group = group),
-      colour = 'black',
-      fill = 'white'
-    ) + geom_point(
-      data = regi_fl[[i]][[2]],
-      aes(x = lon, y = lat),
-      color = 'red',
-      size = 2
-    ) + ggtitle(regi_fl[[i]][[1]])
+    ggplot() + 
+      scale_x_continuous(name="") +
+      scale_y_continuous(name="") +
+      geom_polygon(data = regi, aes(long, lat, group = group), colour = 'black', fill = 'white') + 
+      geom_point(data = regi_fl[[i]][[2]],  aes(x = lon, y = lat), color = 'red', size = 2) + 
+      ggtitle(regi_fl[[i]]$adatok$nev)
   )
-} #pontok regionkent
+} #pontok regionkenti kirajzolasa
 
 
 
+#5
 {
   centroids <- data.frame(gCentroid(regi, byid = TRUE))
   centroids$regiune <- regi$REGIUNE
@@ -155,9 +167,17 @@ for (i in 1:length(regi_fl)) {
       'campie',
       'carpati'
     )
-  ggplot(data = centroids, aes(
-    x = x,
-    y = y,
-    label = centroids$regiune
-  )) + geom_point() + geom_text(vjust = 0, nudge_y = 0.1, aes(colour = factor(s)))
+  ggplot() + 
+    scale_x_continuous(name="") +
+    scale_y_continuous(name="") +
+    geom_polygon(data = rom, aes(long, lat, group=group), colour='black',fill='white') +
+    geom_point(data = centroids, aes(x = x, y = y, shape = factor(s), colour = factor(s)), size = 4) + 
+    geom_text(data = centroids, vjust = 0, nudge_y = 0.1, aes(x = x, y = y, label = centroids$regiune))
 } #regionkenti centroidok meghatarozasa + kategorizalas
+
+
+
+
+
+
+
