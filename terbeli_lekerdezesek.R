@@ -93,7 +93,9 @@ dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, 
 
 # plot(regi)
 # points(dat$lat ~ dat$lon, col = "red")
-ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + geom_point(data=dat, aes(x=lon, y=lat), color='red',size=2)
+ggplot() + 
+  geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + 
+  geom_point(data=dat, aes(x=lon, y=lat), color='red',size=2)
 
 
 
@@ -118,15 +120,11 @@ ggplot() + geom_polygon(data = regi, aes(long, lat, group=group), colour='black'
     }
     fajok = dat[-new_shape_2,]
     corr = length(unique(fajok$sp))/(regi$Terulet[i]/1000) #a terulet milyen formaba szerepeljen?
-    regi_fl[[i]] <- list(adatok = data.frame(nev = nevek[i], terulet = regi$Terulet[i], corr = corr), fajok = fajok)
+    regi_fl[[i]] <- list(adatok = data.frame(nev = nevek[i], terulet = regi$Terulet[i], telj_fsz = length(unique(fajok$sp)), corr_fsz = corr), fajok = fajok)
   } 
   #a regi_fl[[1]][[1]] tartalmazza a regio nevet, a regi_fl[[1]][[2]] tartalmazza a regioba talalhato pontokat
   #rei_fl[[i]] az i edik regio informacioi (osszesen 16 van)
   #pl: regi_fl[[2]][[2]][1,] parancsal lehet elerni a masodik listaba levo data frame elemeit
-  
-  
-  
-  unlist(lapply(regi_fl, function(x) {lapply(x$adatok$corr, identity)})) #visszateriti a corr erteket az osszes eruletrol
 } #regionkent lekerdezzuk a pontokat
 
 
@@ -177,7 +175,13 @@ for (i in 1:length(regi_fl)) {
 
 
 
-
-
-
-
+#6
+{
+  df <- data.frame(matrix(vector(), 0, 4, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam'))), stringsAsFactors=F)
+  for (i in 1:length(regi_fl)) {
+    df[i,]$regio <- unlist(strsplit(as.character(regi_fl[[i]]$adatok$nev), ' - '))[2]
+    df[i,]$terulet <- regi_fl[[i]]$adatok$terulet
+    df[i,]$teles_fajszam <- regi_fl[[i]]$adatok$telj_fsz
+    df[i,]$korrekcios_fajszam <- regi_fl[[i]]$adatok$corr_fsz
+  }
+} #Statisztikahoz elokeszitjuk az adatokat
