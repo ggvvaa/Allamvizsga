@@ -119,8 +119,13 @@ ggplot() +
       }
     }
     fajok = dat[-new_shape_2,]
-    corr = length(unique(fajok$sp))/(regi$Terulet[i]/1000) #a terulet milyen formaba szerepeljen?
-    regi_fl[[i]] <- list(adatok = data.frame(nev = nevek[i], terulet = regi$Terulet[i], telj_fsz = length(unique(fajok$sp)), corr_fsz = corr), fajok = fajok)
+    corr = length(unique(fajok$sp))/((regi$Terulet[i]/1000)^0.15) #a terulet milyen formaba szerepeljen?
+    regi_fl[[i]] <- list(adatok = data.frame(nev = nevek[i], 
+                                             terulet = regi$Terulet[i], 
+                                             telj_fsz = length(unique(fajok$sp)), 
+                                             corr_fsz = corr,
+                                             pontok_szerinti_fsz = nrow(unique(fajok[,c('lon', 'lat')]))), 
+                         fajok = fajok)
   } 
   #a regi_fl[[1]][[1]] tartalmazza a regio nevet, a regi_fl[[1]][[2]] tartalmazza a regioba talalhato pontokat
   #rei_fl[[i]] az i edik regio informacioi (osszesen 16 van)
@@ -177,11 +182,12 @@ for (i in 1:length(regi_fl)) {
 
 #6
 {
-  df <- data.frame(matrix(vector(), 0, 4, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam'))), stringsAsFactors=F)
+  df <- data.frame(matrix(vector(), 0, 5, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam', 'pontok_szerinti_fajszam'))), stringsAsFactors=F)
   for (i in 1:length(regi_fl)) {
     df[i,]$regio <- unlist(strsplit(as.character(regi_fl[[i]]$adatok$nev), ' - '))[2]
     df[i,]$terulet <- regi_fl[[i]]$adatok$terulet
     df[i,]$teles_fajszam <- regi_fl[[i]]$adatok$telj_fsz
     df[i,]$korrekcios_fajszam <- regi_fl[[i]]$adatok$corr_fsz
+    df[i,]$pontok_szerinti_fajszam <- regi_fl[[i]]$adatok$pontok_szerinti_fsz
   }
 } #Statisztikahoz elokeszitjuk az adatokat
