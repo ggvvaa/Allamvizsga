@@ -109,7 +109,10 @@ ggplot() +
   regi_f <- fortify(regi)
   nPolys <- unique(regi_f$id) #a kulombozo regioknak az azonositoi, osszesen 16
   regi_fl = list()
-  nevek <- as.character(regi$DENUMIRE)
+  nevek <- numeric(length(nPolys))
+  for (i in 1:length(nPolys)) {
+    nevek[i] <- unlist(strsplit(as.character(regi$DENUMIRE[i]), ' - '))[2]
+  }
   
   
   
@@ -188,7 +191,7 @@ for (i in 1:length(regi_fl)) {
 {
   df <- data.frame(matrix(vector(), 0, 6, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam', 'gyujtesi_pontok_sz', 'egyedszam'))), stringsAsFactors=F)
   for (i in 1:length(regi_fl)) {
-    df[i,]$regio <- unlist(strsplit(as.character(regi_fl[[i]]$adatok$nev), ' - '))[2]
+    df[i,]$regio <- nevek[i]
     df[i,]$terulet <- regi_fl[[i]]$adatok$terulet
     df[i,]$teles_fajszam <- regi_fl[[i]]$adatok$telj_fsz
     df[i,]$korrekcios_fajszam <- regi_fl[[i]]$adatok$corr_fsz
@@ -196,6 +199,63 @@ for (i in 1:length(regi_fl)) {
     df[i,]$egyedszam <- regi_fl[[i]]$adatok$egyedszam
   }
 } #Statisztikahoz elokeszitjuk az adatokat
+
+
+
+#8
+{
+  aktivi <- unlist(lapply(regi_fl, function(x) {
+                      d <- numeric(12)
+                      for (i in 1:length(x$fajok$datum)) {
+                        d[month(x$fajok[i,]$datum)] <- d[month(x$fajok[i,]$datum)] + x$fajok[i,]$egyed
+                      }
+                      return(d)
+                    }))
+  
+  
+  
+  aktivi1 <- unlist(lapply(regi_fl, function(x) {
+                      d1 <- unique(x$fajok$datum)
+                      d <- numeric(12)
+                      for (i in 1:length(d1)) {
+                        d[month(d1[i])] <- d[month(d1[i])] + 1
+                      }
+                      return(d)
+                    }))
+  
+            
+  
+  aktivi2 <- unlist(lapply(regi_fl, function(x) {
+                      d1 <- unique(x$fajok[,c(5, 13)])
+                      d <- numeric(12)
+                      for (i in 1:length(d1[,2])) {
+                        d[month(d1[i, 1])] <- d[month(d1[i, 1])] + 1
+                      }
+                      return(d)
+                    }))
+  
+  
+  
+  aktivitas <- matrix(c(aktivi), nrow = length(nevek), byrow = T)
+  honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
+  colnames(aktivitas) <- honapok
+  rownames(aktivitas) <- nevek
+  
+  
+  
+  aktivitas1 <- matrix(c(aktivi1), nrow = length(nevek), byrow = T)
+  honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
+  colnames(aktivitas1) <- honapok
+  rownames(aktivitas1) <- nevek
+  
+  
+  
+  aktivitas2 <- matrix(c(aktivi2), nrow = length(nevek), byrow = T)
+  honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
+  colnames(aktivitas2) <- honapok
+  rownames(aktivitas2) <- nevek
+} #a regionkenti befogott gyujtesek/egyedek/fajok szama honapokra lebontva
+
 
 
 #7
@@ -206,4 +266,7 @@ for (i in 1:length(regi_fl)) {
     }
   }
   write.xlsx(df, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Regionkenti adatok', append = TRUE, showNA = F)
-}#exportalas
+  write.xlsx(aktivitas, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkent gyujtott egyedek', append = TRUE, showNA = F)
+  write.xlsx(aktivitas1, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti gyujtesi alkalmak', append = TRUE, showNA = F)
+  write.xlsx(aktivitas2, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti befogott fajok', append = TRUE, showNA = F)
+} #exportalas
