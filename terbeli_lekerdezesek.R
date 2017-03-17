@@ -7,8 +7,8 @@ library(readxl)
 library(maptools)
 library(rgdal)
 library(ggplot2)
-library(lubridate)
-
+library(lubridate) #datumok
+library(xlsx)
 
 
 #1
@@ -196,3 +196,14 @@ for (i in 1:length(regi_fl)) {
     df[i,]$egyedszam <- regi_fl[[i]]$adatok$egyedszam
   }
 } #Statisztikahoz elokeszitjuk az adatokat
+
+
+#7
+{
+  for (i in 1:length(nPolys)) {
+    if (regi_fl[[i]]$adatok$telj_fsz != 0) {
+      write.xlsx(regi_fl[[i]]$fajok, file = "tipulidae_eredmenyek.xlsx", sheetName = df[i,]$regio, append = TRUE, showNA = F)
+    }
+  }
+  write.xlsx(df, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Regionkenti adatok', append = TRUE, showNA = F)
+}#exportalas
