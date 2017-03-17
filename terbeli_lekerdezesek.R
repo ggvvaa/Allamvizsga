@@ -109,7 +109,10 @@ ggplot() +
   regi_f <- fortify(regi)
   nPolys <- unique(regi_f$id) #a kulombozo regioknak az azonositoi, osszesen 16
   regi_fl = list()
-  nevek <- as.character(regi$DENUMIRE)
+  nevek <- numeric(length(nPolys))
+  for (i in 1:length(nPolys)) {
+    nevek[i] <- unlist(strsplit(as.character(regi$DENUMIRE[i]), ' - '))[2]
+  }
   
   
   
@@ -188,7 +191,7 @@ for (i in 1:length(regi_fl)) {
 {
   df <- data.frame(matrix(vector(), 0, 6, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam', 'gyujtesi_pontok_sz', 'egyedszam'))), stringsAsFactors=F)
   for (i in 1:length(regi_fl)) {
-    df[i,]$regio <- unlist(strsplit(as.character(regi_fl[[i]]$adatok$nev), ' - '))[2]
+    df[i,]$regio <- nevek[i]
     df[i,]$terulet <- regi_fl[[i]]$adatok$terulet
     df[i,]$teles_fajszam <- regi_fl[[i]]$adatok$telj_fsz
     df[i,]$korrekcios_fajszam <- regi_fl[[i]]$adatok$corr_fsz
@@ -196,6 +199,7 @@ for (i in 1:length(regi_fl)) {
     df[i,]$egyedszam <- regi_fl[[i]]$adatok$egyedszam
   }
 } #Statisztikahoz elokeszitjuk az adatokat
+
 
 
 #7
@@ -206,4 +210,23 @@ for (i in 1:length(regi_fl)) {
     }
   }
   write.xlsx(df, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Regionkenti adatok', append = TRUE, showNA = F)
-}#exportalas
+} #exportalas
+
+
+
+#8
+{
+  aktivi <- unlist(lapply(regi_fl, function(x) {
+                      d <- numeric(12)
+                      for (i in 1:length(x$fajok$datum)) {
+                        d[month(x$fajok[i,]$datum)] <- d[month(x$fajok[i,]$datum)] + x$fajok[i,]$egyed
+                      }
+                      return(d)
+                    }))
+  
+  
+  
+  aktivitas <- matrix(c(aktivi), nrow = length(nevek), byrow = T)
+  colnames(aktivitas) <- honapok
+  rownames(aktivitas) <- nevek
+} #a regionkenti befogott egyedek szama honapokra lebontva
