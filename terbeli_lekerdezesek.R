@@ -7,6 +7,7 @@ library(readxl)
 library(maptools)
 library(rgdal)
 library(ggplot2)
+library(lubridate)
 
 
 
@@ -30,7 +31,9 @@ id <- unlist(t_data$obm_id)
 la <- unlist(t_data$latitude)
 lo <- unlist(t_data$longitude)
 sp <- unlist(t_data$species_id)
-dat <- data.frame(id = id, lon = lo, lat = la, fam = NA, subfam = NA, gen = NA, subgen = NA, spec = NA, subspec = NA, auth = NA, sp = sp)
+datum <- as.POSIXlt(unlist(t_data$collection_date))
+egyed <- unlist(t_data$males) + unlist(t_data$females)
+dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam = NA, subfam = NA, gen = NA, subgen = NA, spec = NA, subspec = NA, auth = NA, sp = sp)
 } #kiindulasi adatok lekerdezese
 
 
@@ -118,13 +121,14 @@ ggplot() +
         new_shape_2[length(new_shape_2) + 1] <- j
       }
     }
-    fajok = dat[-new_shape_2,]
-    corr = length(unique(fajok$sp))/((regi$Terulet[i]/1000)^0.15) #a terulet milyen formaba szerepeljen?
+    fajok <- dat[-new_shape_2,]
+    corr <- length(unique(fajok$sp))/((regi$Terulet[i]/1000)^0.15) #a terulet milyen formaba szerepeljen?
     regi_fl[[i]] <- list(adatok = data.frame(nev = nevek[i], 
                                              terulet = regi$Terulet[i], 
                                              telj_fsz = length(unique(fajok$sp)), 
                                              corr_fsz = corr,
-                                             pontok_szerinti_fsz = nrow(unique(fajok[,c('lon', 'lat')]))), 
+                                             gyujtesi_pontok_sz = nrow(unique(fajok[,c('lon', 'lat')])),
+                                             egyedszam = sum(fajok$egyed)), 
                          fajok = fajok)
   } 
   #a regi_fl[[1]][[1]] tartalmazza a regio nevet, a regi_fl[[1]][[2]] tartalmazza a regioba talalhato pontokat
@@ -182,12 +186,13 @@ for (i in 1:length(regi_fl)) {
 
 #6
 {
-  df <- data.frame(matrix(vector(), 0, 5, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam', 'pontok_szerinti_fajszam'))), stringsAsFactors=F)
+  df <- data.frame(matrix(vector(), 0, 6, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam', 'gyujtesi_pontok_sz', 'egyedszam'))), stringsAsFactors=F)
   for (i in 1:length(regi_fl)) {
     df[i,]$regio <- unlist(strsplit(as.character(regi_fl[[i]]$adatok$nev), ' - '))[2]
     df[i,]$terulet <- regi_fl[[i]]$adatok$terulet
     df[i,]$teles_fajszam <- regi_fl[[i]]$adatok$telj_fsz
     df[i,]$korrekcios_fajszam <- regi_fl[[i]]$adatok$corr_fsz
-    df[i,]$pontok_szerinti_fajszam <- regi_fl[[i]]$adatok$pontok_szerinti_fsz
+    df[i,]$gyujtesi_pontok_sz <- regi_fl[[i]]$adatok$gyujtesi_pontok_sz
+    df[i,]$egyedszam <- regi_fl[[i]]$adatok$egyedszam
   }
 } #Statisztikahoz elokeszitjuk az adatokat
