@@ -9,6 +9,8 @@ library(rgdal)
 library(ggplot2)
 library(lubridate) #datumok
 library(xlsx)
+library(plyr) #duplikalt adat szamolas
+
 
 
 #1
@@ -204,32 +206,11 @@ for (i in 1:length(regi_fl)) {
 
 #8
 {
+  #regionkenti egyedek lekerdezese honaponkent
   aktivi <- unlist(lapply(regi_fl, function(x) {
                       d <- numeric(12)
                       for (i in 1:length(x$fajok$datum)) {
                         d[month(x$fajok[i,]$datum)] <- d[month(x$fajok[i,]$datum)] + x$fajok[i,]$egyed
-                      }
-                      return(d)
-                    }))
-  
-  
-  
-  aktivi1 <- unlist(lapply(regi_fl, function(x) {
-                      d1 <- unique(x$fajok$datum)
-                      d <- numeric(12)
-                      for (i in 1:length(d1)) {
-                        d[month(d1[i])] <- d[month(d1[i])] + 1
-                      }
-                      return(d)
-                    }))
-  
-            
-  
-  aktivi2 <- unlist(lapply(regi_fl, function(x) {
-                      d1 <- unique(x$fajok[,c(5, 13)])
-                      d <- numeric(12)
-                      for (i in 1:length(d1[,2])) {
-                        d[month(d1[i, 1])] <- d[month(d1[i, 1])] + 1
                       }
                       return(d)
                     }))
@@ -243,18 +224,65 @@ for (i in 1:length(regi_fl)) {
   
   
   
+  #honaponkenti gyujtesek szamanak lekerdezese regionkent
+  aktivi1 <- unlist(lapply(regi_fl, function(x) {
+                      d1 <- unique(x$fajok$datum)
+                      d <- numeric(12)
+                      for (i in 1:length(d1)) {
+                        d[month(d1[i])] <- d[month(d1[i])] + 1
+                      }
+                      return(d)
+                    }))
+  
+            
+  
   aktivitas1 <- matrix(c(aktivi1), nrow = length(nevek), byrow = T)
   honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
   colnames(aktivitas1) <- honapok
-  rownames(aktivitas1) <- nevek
+  rownames(aktivitas1) <- nevek 
   
+  
+  
+  #honaponkenti fajok szama regionkent 
+  aktivi2 <- unlist(lapply(regi_fl, function(x) {
+                      d1 <- unique(x$fajok[,c(5, 13)])
+                      d <- numeric(12)
+                      for (i in 1:length(d1[,2])) {
+                        d[month(d1[i, 1])] <- d[month(d1[i, 1])] + 1
+                      }
+                      return(d)
+                    }))
+
   
   
   aktivitas2 <- matrix(c(aktivi2), nrow = length(nevek), byrow = T)
   honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
   colnames(aktivitas2) <- honapok
   rownames(aktivitas2) <- nevek
-} #a regionkenti befogott gyujtesek/egyedek/fajok szama honapokra lebontva
+  
+  
+  
+  #fajok szerinti gyujtese szama regionkent
+  #aa <- ddply(regi_fl[[2]]$fajok, .(sp), nrow)
+  ef <- unique(dat[,6:13])
+  ef_m <- unlist(lapply(regi_fl, function(x) {
+    d <- ddply(x$fajok, .(sp), nrow)
+    d1 <- matrix(rep(0, nrow(ef)), nrow = 1)
+    colnames(d1) <- ef$sp
+    if (length(d$sp) != 0) {
+      for (i in 1:length(d$sp)) {
+        d1[1,paste(d$sp[i])] <- d$V1[i]
+      }
+    }
+    return(d1)
+  }))
+  
+  
+  
+  ef_m <- matrix(ef_m, nrow = length(nevek), byrow = T)
+  colnames(ef_m) <- paste(ef$fam, ' ', ef$subfam, ' ', ef$gen, ' ', ef$subgen, ' ', ef$spec, ' ', ef$subspec)
+  rownames(ef_m) <- nevek
+} #tabalzato lekerdezesek
 
 
 
@@ -269,4 +297,5 @@ for (i in 1:length(regi_fl)) {
   write.xlsx(aktivitas, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkent gyujtott egyedek', append = TRUE, showNA = F)
   write.xlsx(aktivitas1, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti gyujtesi alkalmak', append = TRUE, showNA = F)
   write.xlsx(aktivitas2, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti befogott fajok', append = TRUE, showNA = F)
+  write.xlsx(ef_m, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Fajok szerinti gyujtese szama', append = TRUE, showNA = F)
 } #exportalas
