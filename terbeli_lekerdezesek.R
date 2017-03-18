@@ -10,6 +10,7 @@ library(ggplot2)
 library(lubridate) #datumok
 library(xlsx)
 library(plyr) #duplikalt adat szamolas
+library(reshape2) #kel a braplot abrazolashoz
 
 
 
@@ -96,15 +97,6 @@ dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam
 
 
 
-# plot(regi)
-# points(dat$lat ~ dat$lon, col = "red")
-ggplot() + 
-  geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + 
-  geom_point(data=dat, aes(x=lon, y=lat), color='red',size=2)
-
-
-
-
 #4
 {
   #nPolys <- sapply(regi@polygons, function(x)length(x@Polygons)) #megmondja hogy melyik polygon, hany reszbol all
@@ -142,19 +134,6 @@ ggplot() +
 } #regionkent lekerdezzuk a pontokat
 
 
-  
-for (i in 1:length(regi_fl)) {
-  print(
-    ggplot() + 
-      scale_x_continuous(name="") +
-      scale_y_continuous(name="") +
-      geom_polygon(data = regi, aes(long, lat, group = group), colour = 'black', fill = 'white') + 
-      geom_point(data = regi_fl[[i]][[2]],  aes(x = lon, y = lat), color = 'red', size = 2) + 
-      ggtitle(regi_fl[[i]]$adatok$nev)
-  )
-} #pontok regionkenti kirajzolasa
-
-
 
 #5
 {
@@ -185,7 +164,7 @@ for (i in 1:length(regi_fl)) {
     geom_polygon(data = rom, aes(long, lat, group=group), colour='black',fill='white') +
     geom_point(data = centroids, aes(x = x, y = y, shape = factor(s), colour = factor(s)), size = 4) + 
     geom_text(data = centroids, vjust = 0, nudge_y = 0.1, aes(x = x, y = y, label = centroids$regiune))
-} #regionkenti centroidok meghatarozasa + kategorizalas
+} #regionkenti centroidok meghatarozasa + kategorizalas + kirajzolas
 
 
 
@@ -279,10 +258,10 @@ for (i in 1:length(regi_fl)) {
   
   
   
-  ef_m <- matrix(ef_m, nrow = length(nevek), byrow = T)
+  ef_m <- matrix(ef_m, ncol = length(ef$sp), byrow = T)
   colnames(ef_m) <- paste(ef$fam, ' ', ef$subfam, ' ', ef$gen, ' ', ef$subgen, ' ', ef$spec, ' ', ef$subspec)
   rownames(ef_m) <- nevek
-} #tabalzato lekerdezesek
+} #tabalzatok lekerdezesek
 
 
 
@@ -299,3 +278,42 @@ for (i in 1:length(regi_fl)) {
   write.xlsx(aktivitas2, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti befogott fajok', append = TRUE, showNA = F)
   write.xlsx(ef_m, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Fajok szerinti gyujtese szama', append = TRUE, showNA = F)
 } #exportalas
+
+
+
+#9
+{
+  #pontok regionkenti kirajzolasa
+  for (i in 1:length(regi_fl)) {
+    print(
+      ggplot() + 
+        scale_x_continuous(name="") +
+        scale_y_continuous(name="") +
+        geom_polygon(data = regi, aes(long, lat, group = group), colour = 'black', fill = 'white') + 
+        geom_point(data = regi_fl[[i]][[2]],  aes(x = lon, y = lat), color = 'red', size = 2) + 
+        ggtitle(regi_fl[[i]]$adatok$nev)
+    )
+  } 
+  
+  
+  
+  #romaniaban talalhato pntok kirajzolasa
+  ggplot() + 
+    geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + 
+    geom_point(data=dat, aes(x=lon, y=lat), color='red',size=2)
+  
+  
+  
+  #honaponkenti gyujtesek regionkenti kirajzolasa
+  r_aktivitas <- melt(aktivitas)
+  su <- matrix(as.integer(colSums(aktivitas)), nrow = 1)
+  colnames(su) <- honapok
+  r_su <- melt(su)
+  
+  
+  
+  ggplot() + 
+    geom_bar(data = r_aktivitas, aes(x = Var2, y = value, fill = factor(Var1)), stat = "identity", position="dodge", width=1) +
+    geom_line(data = r_su, aes(x = Var2, y = value, group = Var1, color = factor(Var2))) + 
+    guides(colour=FALSE)
+} #plot - oks
