@@ -16,27 +16,27 @@ library(reshape2) #kel a braplot abrazolashoz
 
 #1
 {
-OBM_init('transdiptera')
-tokeRn <- OBM_auth('veres_robi75@yahoo.com', '123456')
-t_data <- OBM_get('get_data', '*')
-t_data <- data.frame(t_data)
-t_data[, 2:8] <- NULL #kivesz egy par oszlopot
-
-
-
-regi <- readOGR("/home/robi/Allamvizsga/Qgis/Regiune/Regiune.shp", layer = "Regiune")
-rom <- readOGR("/home/robi/Allamvizsga/Qgis/Subregiune/Romania_teljes.shp", layer = "Romania_teljes")
-tipuloidae <- read_excel("~/Allamvizsga/Fajlista_teljes.xlsx", sheet = "Tipulidae")
-
-
-
-id <- unlist(t_data$obm_id)
-la <- unlist(t_data$latitude)
-lo <- unlist(t_data$longitude)
-sp <- unlist(t_data$species_id)
-datum <- as.POSIXlt(unlist(t_data$collection_date))
-egyed <- unlist(t_data$males) + unlist(t_data$females)
-dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam = NA, subfam = NA, gen = NA, subgen = NA, spec = NA, subspec = NA, auth = NA, sp = sp)
+  OBM_init('transdiptera')
+  tokeRn <- OBM_auth('veres_robi75@yahoo.com', '123456')
+  t_data <- OBM_get('get_data', '*')
+  t_data <- data.frame(t_data)
+  t_data[, 2:8] <- NULL #kivesz egy par oszlopot
+  
+  
+  
+  rom <- readOGR("/home/robi/Allamvizsga/Qgis/Subregiune/Romania_teljes.shp", layer = "Romania_teljes")
+  tipuloidae <- read_excel("~/Allamvizsga/Fajlista_teljes.xlsx", sheet = "Tipulidae")
+  regi <- readOGR("/home/robi/Allamvizsga/Qgis/Regiune/Regiune.shp", layer = "Regiune")
+  uj_regi <- readOGR("/home/robi/Allamvizsga/Qgis/uj regio hatarok/2.shp")
+  
+  
+  id <- unlist(t_data$obm_id)
+  la <- unlist(t_data$latitude)
+  lo <- unlist(t_data$longitude)
+  sp <- unlist(t_data$species_id)
+  datum <- as.POSIXlt(unlist(t_data$collection_date))
+  egyed <- unlist(t_data$males) + unlist(t_data$females)
+  dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam = NA, subfam = NA, gen = NA, subgen = NA, spec = NA, subspec = NA, auth = NA, sp = sp)
 } #kiindulasi adatok lekerdezese
 
 
@@ -97,44 +97,6 @@ dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam
 
 
 
-#4
-{
-  #nPolys <- sapply(regi@polygons, function(x)length(x@Polygons)) #megmondja hogy melyik polygon, hany reszbol all
-  regi_f <- fortify(regi)
-  nPolys <- unique(regi_f$id) #a kulombozo regioknak az azonositoi, osszesen 16
-  regi_fl = list()
-  nevek <- numeric(length(nPolys))
-  for (i in 1:length(nPolys)) {
-    nevek[i] <- unlist(strsplit(as.character(regi$DENUMIRE[i]), ' - '))[2]
-  }
-  
-  
-  
-  for (i in 1:length(nPolys)) {
-    new_shape_1 <- point.in.polygon(dat$lon, dat$lat, regi_f[regi_f$id == nPolys[i],]$long, regi_f[regi_f$id == nPolys[i],]$lat)
-    new_shape_2 <- numeric(0)
-    for (j in 1:length(new_shape_1)) {
-      if (new_shape_1[j] == 0) {
-        new_shape_2[length(new_shape_2) + 1] <- j
-      }
-    }
-    fajok <- dat[-new_shape_2,]
-    corr <- length(unique(fajok$sp))/((regi$Terulet[i]/1000)^0.15) #a terulet milyen formaba szerepeljen?
-    regi_fl[[i]] <- list(adatok = data.frame(nev = nevek[i], 
-                                             terulet = regi$Terulet[i], 
-                                             telj_fsz = length(unique(fajok$sp)), 
-                                             corr_fsz = corr,
-                                             gyujtesi_pontok_sz = nrow(unique(fajok[,c('lon', 'lat')])),
-                                             egyedszam = sum(fajok$egyed)), 
-                         fajok = fajok)
-  } 
-  #a regi_fl[[1]][[1]] tartalmazza a regio nevet, a regi_fl[[1]][[2]] tartalmazza a regioba talalhato pontokat
-  #rei_fl[[i]] az i edik regio informacioi (osszesen 16 van)
-  #pl: regi_fl[[2]][[2]][1,] parancsal lehet elerni a masodik listaba levo data frame elemeit
-} #regionkent lekerdezzuk a pontokat
-
-
-
 #5
 {
   centroids <- data.frame(gCentroid(regi, byid = TRUE))
@@ -168,139 +130,188 @@ dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam
 
 
 
-#6
-{
-  df <- data.frame(matrix(vector(), 0, 6, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam', 'gyujtesi_pontok_sz', 'egyedszam'))), stringsAsFactors=F)
-  for (i in 1:length(regi_fl)) {
-    df[i,]$regio <- nevek[i]
-    df[i,]$terulet <- regi_fl[[i]]$adatok$terulet
-    df[i,]$teles_fajszam <- regi_fl[[i]]$adatok$telj_fsz
-    df[i,]$korrekcios_fajszam <- regi_fl[[i]]$adatok$corr_fsz
-    df[i,]$gyujtesi_pontok_sz <- regi_fl[[i]]$adatok$gyujtesi_pontok_sz
-    df[i,]$egyedszam <- regi_fl[[i]]$adatok$egyedszam
-  }
-} #Statisztikahoz elokeszitjuk az adatokat
-
-
-
 #8
 {
-  #regionkenti egyedek lekerdezese honaponkent
-  aktivi <- unlist(lapply(regi_fl, function(x) {
-                      d <- numeric(12)
-                      for (i in 1:length(x$fajok$datum)) {
-                        d[month(x$fajok[i,]$datum)] <- d[month(x$fajok[i,]$datum)] + x$fajok[i,]$egyed
-                      }
-                      return(d)
-                    }))
+  asd <- c('regi', 'uj_regi')
+  #eval(as.name(paste(asd[i])))
+  #lehet olyat is csinalni hogy eval(as.name(paste(asd[1])))[[2]]$adatok
   
-  
-  
-  aktivitas <- matrix(c(aktivi), nrow = length(nevek), byrow = T)
-  honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
-  colnames(aktivitas) <- honapok
-  rownames(aktivitas) <- nevek
-  
-  
-  
-  #honaponkenti gyujtesi napok szama regionkent
-  aktivi1 <- unlist(lapply(regi_fl, function(x) {
-                      d1 <- unique(x$fajok$datum)
-                      d <- numeric(12)
-                      for (i in 1:length(d1)) {
-                        d[month(d1[i])] <- d[month(d1[i])] + 1
-                      }
-                      return(d)
-                    }))
-  
-            
-  
-  aktivitas1 <- matrix(c(aktivi1), nrow = length(nevek), byrow = T)
-  honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
-  colnames(aktivitas1) <- honapok
-  rownames(aktivitas1) <- nevek 
-  
-  
-  
-  #honaponkenti fajok szama regionkent 
-  aktivi2 <- unlist(lapply(regi_fl, function(x) {
-                      d1 <- data.frame(d = month(x$fajok$datum), f = x$fajok$sp)
-                      d1 <- unique(d1[,c(1,2)])
-                      d <- numeric(12)
-                      for (i in 1:length(d1[,2])) {
-                        d[month(d1[i, 1])] <- d[month(d1[i, 1])] + 1
-                      }
-                      return(d)
-                    }))
 
   
-  
-  aktivitas2 <- matrix(c(aktivi2), nrow = length(nevek), byrow = T)
-  honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
-  colnames(aktivitas2) <- honapok
-  rownames(aktivitas2) <- nevek
-  
-  
-  
-  #fajok szerinti gyujtese szama regionkent
-  #aa <- ddply(regi_fl[[2]]$fajok, .(sp), nrow)
-  ef <- unique(dat[,6:13])
-  ef_m <- unlist(lapply(regi_fl, function(x) {
-                    d <- ddply(x$fajok, .(sp), nrow)
-                    d1 <- matrix(rep(0, nrow(ef)), nrow = 1)
-                    colnames(d1) <- ef$sp
-                    if (length(d$sp) != 0) {
-                      for (i in 1:length(d$sp)) {
-                        d1[1,paste(d$sp[i])] <- d$V1[i]
-                      }
-                    }
-                    return(d1)
-                  }))
-                  
-  
-  
-  ef_m <- matrix(ef_m, ncol = length(ef$sp), byrow = T)
-  colnames(ef_m) <- paste(ef$fam, ' ', ef$subfam, ' ', ef$gen, ' ', ef$subgen, ' ', ef$spec, ' ', ef$subspec)
-  rownames(ef_m) <- nevek
-  
-  
-  
-  #fajok szerinti gyujtott egyedek szama 
-  ef <- unique(dat[,6:13])
-  aktivi3 <- unlist(lapply(regi_fl, function(x) {
-                      d1 <- matrix(rep(0, nrow(ef)), nrow = 1)
-                      colnames(d1) <- ef$sp
-                      if (length(x$fajok$sp) != 0) {
-                        for (i in 1:length(x$fajok$sp)) {
-                          d1[1,paste(x$fajok$sp[i])] <- d1[1,paste(x$fajok$sp[i])] + x$fajok[i,]$egyed
+  for (i in 1:length(asd)) {
+    #4
+    {
+      #nPolys <- sapply(regi@polygons, function(x)length(x@Polygons)) #megmondja hogy melyik polygon, hany reszbol all
+      regi_f <- fortify(eval(as.name(paste(asd[i]))))
+      nPolys <- unique(regi_f$id) #a kulombozo regioknak az azonositoi, osszesen 16
+      regi_fl = list()
+      nevek <- numeric(length(nPolys))
+      for (k in 1:length(nPolys)) {
+        nevek[k] <- as.character(regi$Megnevezes[k])
+      }
+
+      
+      
+      for (l in 1:length(nPolys)) {
+        new_shape_1 <- point.in.polygon(dat$lon, dat$lat, regi_f[regi_f$id == nPolys[l],]$long, regi_f[regi_f$id == nPolys[l],]$lat)
+        new_shape_2 <- numeric(0)
+        for (m in 1:length(new_shape_1)) {
+          if (new_shape_1[m] == 0) {
+            new_shape_2[length(new_shape_2) + 1] <- m
+          }
+        }
+        fajok <- dat[-new_shape_2,]
+        corr <- length(unique(fajok$sp))/((regi$Terulet[l]/1000)^0.15) #a terulet milyen formaba szerepeljen?
+        regi_fl[[l]] <- list(adatok = data.frame(nev = nevek[l], 
+                                                 terulet = regi$Terulet[l], 
+                                                 telj_fsz = length(unique(fajok$sp)), 
+                                                 corr_fsz = corr,
+                                                 gyujtesi_pontok_sz = nrow(unique(fajok[,c('lon', 'lat')])),
+                                                 egyedszam = sum(fajok$egyed)), 
+                             fajok = fajok)
+      } 
+      #a regi_fl[[1]][[1]] tartalmazza a regio nevet, a regi_fl[[1]][[2]] tartalmazza a regioba talalhato pontokat
+      #rei_fl[[i]] az i edik regio informacioi (osszesen 16 van)
+      #pl: regi_fl[[2]][[2]][1,] parancsal lehet elerni a masodik listaba levo data frame elemeit
+    }#regionkent lekerdezzuk a pontokat
+    
+    
+    
+    #lekerdezesek
+    {
+      #regionkenti egyedek lekerdezese honaponkent
+      aktivi <- unlist(lapply(regi_fl, function(x) {
+                          d <- numeric(12)
+                          for (i in 1:length(x$fajok$datum)) {
+                            d[month(x$fajok[i,]$datum)] <- d[month(x$fajok[i,]$datum)] + x$fajok[i,]$egyed
+                          }
+                          return(d)
+                        }))
+      
+      
+      
+      aktivitas <- matrix(c(aktivi), nrow = length(nevek), byrow = T)
+      honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
+      colnames(aktivitas) <- honapok
+      rownames(aktivitas) <- nevek
+      
+      
+      
+      #honaponkenti gyujtesi napok szama regionkent
+      aktivi1 <- unlist(lapply(regi_fl, function(x) {
+                          d1 <- unique(x$fajok$datum)
+                          d <- numeric(12)
+                          for (i in 1:length(d1)) {
+                            d[month(d1[i])] <- d[month(d1[i])] + 1
+                          }
+                          return(d)
+                        }))
+      
+                
+      
+      aktivitas1 <- matrix(c(aktivi1), nrow = length(nevek), byrow = T)
+      honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
+      colnames(aktivitas1) <- honapok
+      rownames(aktivitas1) <- nevek 
+      
+      
+      
+      #honaponkenti fajok szama regionkent 
+      aktivi2 <- unlist(lapply(regi_fl, function(x) {
+                          d1 <- data.frame(d = month(x$fajok$datum), f = x$fajok$sp)
+                          d1 <- unique(d1[,c(1,2)])
+                          d <- numeric(12)
+                          for (i in 1:length(d1[,2])) {
+                            d[month(d1[i, 1])] <- d[month(d1[i, 1])] + 1
+                          }
+                          return(d)
+                        }))
+    
+      
+      
+      aktivitas2 <- matrix(c(aktivi2), nrow = length(nevek), byrow = T)
+      honapok <- c('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
+      colnames(aktivitas2) <- honapok
+      rownames(aktivitas2) <- nevek
+      
+      
+      
+      #fajok szerinti gyujtese szama regionkent
+      #aa <- ddply(regi_fl[[2]]$fajok, .(sp), nrow)
+      ef <- unique(dat[,6:13])
+      ef_m <- unlist(lapply(regi_fl, function(x) {
+                        d <- ddply(x$fajok, .(sp), nrow)
+                        d1 <- matrix(rep(0, nrow(ef)), nrow = 1)
+                        colnames(d1) <- ef$sp
+                        if (length(d$sp) != 0) {
+                          for (i in 1:length(d$sp)) {
+                            d1[1,paste(d$sp[i])] <- d$V1[i]
+                          }
                         }
-                      }
-                      return(d1)
-                    }))
-                    
-  
-  
-  aktivitas3 <- matrix(aktivi3, ncol = length(ef$sp), byrow = T)
-  colnames(aktivitas3) <- paste(ef$fam, ' ', ef$subfam, ' ', ef$gen, ' ', ef$subgen, ' ', ef$spec, ' ', ef$subspec)
-  rownames(aktivitas3) <- nevek
-} #tabalzatok lekerdezesek
-
-
-
-#7
-{
-  for (i in 1:length(nPolys)) {
-    if (regi_fl[[i]]$adatok$telj_fsz != 0) {
-      write.xlsx(regi_fl[[i]]$fajok, file = "tipulidae_eredmenyek.xlsx", sheetName = df[i,]$regio, append = TRUE, showNA = F)
+                        return(d1)
+                      }))
+                      
+      
+      
+      ef_m <- matrix(ef_m, ncol = length(ef$sp), byrow = T)
+      colnames(ef_m) <- paste(ef$fam, ' ', ef$subfam, ' ', ef$gen, ' ', ef$subgen, ' ', ef$spec, ' ', ef$subspec)
+      rownames(ef_m) <- nevek
+      
+      
+      
+      #fajok szerinti gyujtott egyedek szama 
+      ef <- unique(dat[,6:13])
+      aktivi3 <- unlist(lapply(regi_fl, function(x) {
+                          d1 <- matrix(rep(0, nrow(ef)), nrow = 1)
+                          colnames(d1) <- ef$sp
+                          if (length(x$fajok$sp) != 0) {
+                            for (i in 1:length(x$fajok$sp)) {
+                              d1[1,paste(x$fajok$sp[i])] <- d1[1,paste(x$fajok$sp[i])] + x$fajok[i,]$egyed
+                            }
+                          }
+                          return(d1)
+                        }))
+                        
+      
+      
+      aktivitas3 <- matrix(aktivi3, ncol = length(ef$sp), byrow = T)
+      colnames(aktivitas3) <- paste(ef$fam, ' ', ef$subfam, ' ', ef$gen, ' ', ef$subgen, ' ', ef$spec, ' ', ef$subspec)
+      rownames(aktivitas3) <- nevek
     }
+    
+    
+    
+    #6
+    {
+      df <- data.frame(matrix(vector(), 0, 6, dimnames = list(c(), c('regio', 'terulet', 'teles_fajszam', 'korrekcios_fajszam', 'gyujtesi_pontok_sz', 'egyedszam'))), stringsAsFactors=F)
+      for (n in 1:length(regi_fl)) {
+        df[n,]$regio <- nevek[n]
+        df[n,]$terulet <- regi_fl[[n]]$adatok$terulet
+        df[n,]$teles_fajszam <- regi_fl[[n]]$adatok$telj_fsz
+        df[n,]$korrekcios_fajszam <- regi_fl[[n]]$adatok$corr_fsz
+        df[n,]$gyujtesi_pontok_sz <- regi_fl[[n]]$adatok$gyujtesi_pontok_sz
+        df[n,]$egyedszam <- regi_fl[[n]]$adatok$egyedszam
+      }
+    } #Statisztikahoz elokeszitjuk az adatokat
+    
+    
+    
+    #7
+    {
+      for (j in 1:length(nPolys)) {
+        if (regi_fl[[j]]$adatok$telj_fsz != 0) {
+          write.xlsx(regi_fl[[j]]$fajok, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = df[j,]$regio, append = TRUE, showNA = F)
+        }
+      }
+      write.xlsx(df, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Regionkenti adatok', append = TRUE, showNA = F)
+      write.xlsx(aktivitas, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Honaponkent gyujtott egyedek', append = TRUE, showNA = F)
+      write.xlsx(aktivitas1, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Honaponkenti gyujtesi napok szama', append = TRUE, showNA = F)
+      write.xlsx(aktivitas2, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Honaponkenti fajok szama', append = TRUE, showNA = F)
+      write.xlsx(ef_m, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Fajok szerinti gyujtese szama', append = TRUE, showNA = F)
+      write.xlsx(aktivitas3, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Fajok szerinti gyujtott egyedek szama', append = TRUE, showNA = F)
+    } #exportalas 
   }
-  write.xlsx(df, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Regionkenti adatok', append = TRUE, showNA = F)
-  write.xlsx(aktivitas, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkent gyujtott egyedek', append = TRUE, showNA = F)
-  write.xlsx(aktivitas1, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti gyujtesi napok szama', append = TRUE, showNA = F)
-  write.xlsx(aktivitas2, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti fajok szama', append = TRUE, showNA = F)
-  write.xlsx(ef_m, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Fajok szerinti gyujtese szama', append = TRUE, showNA = F)
-  write.xlsx(aktivitas3, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Fajok szerinti gyujtott egyedek szama', append = TRUE, showNA = F)
-} #exportalas
+} #tabalzatok elkeszitese
 
 
 

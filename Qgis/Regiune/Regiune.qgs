@@ -5,7 +5,7 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
     <customproperties/>
-    <layer-tree-layer expanded="0" checked="Qt::Checked" id="Regiune20170307160610923" name="Regiune">
+    <layer-tree-layer expanded="1" checked="Qt::Checked" id="Regiune20170319170711849" name="Regiune">
       <customproperties/>
     </layer-tree-layer>
   </layer-tree-group>
@@ -13,10 +13,10 @@
   <mapcanvas>
     <units>degrees</units>
     <extent>
-      <xmin>20.02596252736011451</xmin>
-      <ymin>43.50311377672570501</ymin>
-      <xmax>29.95654844183300014</xmax>
-      <ymax>48.3810100318275218</ymax>
+      <xmin>19.86734900233728851</xmin>
+      <ymin>43.44794385497863232</ymin>
+      <xmax>29.79793491681017414</xmax>
+      <ymax>48.32584011008044911</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>0</projections>
@@ -39,13 +39,13 @@
   </mapcanvas>
   <layer-tree-canvas>
     <custom-order enabled="0">
-      <item>Regiune20170307160610923</item>
+      <item>Regiune20170319170711849</item>
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
-    <legendlayer drawingOrder="-1" open="false" checked="Qt::Checked" name="Regiune" showFeatureCount="0">
-      <filegroup open="false" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="Regiune20170307160610923" visible="1"/>
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="Regiune" showFeatureCount="0">
+      <filegroup open="true" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="Regiune20170319170711849" visible="1"/>
       </filegroup>
     </legendlayer>
   </legend>
@@ -57,7 +57,7 @@
         <xmax>29.72010592005983654</xmax>
         <ymax>48.26486964480128705</ymax>
       </extent>
-      <id>Regiune20170307160610923</id>
+      <id>Regiune20170319170711849</id>
       <datasource>./Regiune.shp</datasource>
       <keywordList>
         <value></value>
@@ -76,7 +76,7 @@
         </spatialrefsys>
       </srs>
       <provider encoding="System">ogr</provider>
-      <previewExpression></previewExpression>
+      <previewExpression>COALESCE( "ID", '&lt;NULL>' )</previewExpression>
       <vectorjoins/>
       <layerDependencies/>
       <expressionfields/>
@@ -85,6 +85,9 @@
       </map-layer-style-manager>
       <edittypes>
         <edittype widgetv2type="TextEdit" name="ID">
+          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="Megnevezes">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
         <edittype widgetv2type="TextEdit" name="REGIUNE">
@@ -106,9 +109,6 @@
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
         <edittype widgetv2type="TextEdit" name="Terulet">
-          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-        </edittype>
-        <edittype widgetv2type="TextEdit" name="DENUMIRE">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
       </edittypes>
@@ -616,19 +616,19 @@
       <annotationform>.</annotationform>
       <aliases>
         <alias field="ID" index="0" name=""/>
-        <alias field="REGIUNE" index="1" name=""/>
-        <alias field="SUBREGIUNE" index="2" name=""/>
-        <alias field="GRUPAUNIT5" index="3" name=""/>
-        <alias field="UNIT5GRUP6" index="4" name=""/>
-        <alias field="UNIT6GRUP7" index="5" name=""/>
-        <alias field="UNIT_ORD_7" index="6" name=""/>
-        <alias field="Terulet" index="7" name=""/>
-        <alias field="DENUMIRE" index="8" name=""/>
+        <alias field="Megnevezes" index="1" name=""/>
+        <alias field="REGIUNE" index="2" name=""/>
+        <alias field="SUBREGIUNE" index="3" name=""/>
+        <alias field="GRUPAUNIT5" index="4" name=""/>
+        <alias field="UNIT5GRUP6" index="5" name=""/>
+        <alias field="UNIT6GRUP7" index="6" name=""/>
+        <alias field="UNIT_ORD_7" index="7" name=""/>
+        <alias field="Terulet" index="8" name=""/>
       </aliases>
       <excludeAttributesWMS/>
       <excludeAttributesWFS/>
       <attributeactions default="-1"/>
-      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="1979527400">
+      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="&quot;ID&quot;" sortOrder="0">
         <columns>
           <column width="-1" hidden="0" type="field" name="ID"/>
           <column width="263" hidden="0" type="field" name="DENUMIRE"/>
@@ -637,7 +637,7 @@
           <column width="-1" hidden="0" type="field" name="GRUPAUNIT5"/>
           <column width="-1" hidden="0" type="field" name="UNIT5GRUP6"/>
           <column width="-1" hidden="0" type="field" name="UNIT6GRUP7"/>
-          <column width="-1" hidden="0" type="field" name="UNIT_ORD_7"/>
+          <column width="195" hidden="0" type="field" name="UNIT_ORD_7"/>
           <column width="-1" hidden="1" type="actions"/>
         </columns>
       </attributetableconfig>
@@ -671,6 +671,7 @@ def my_form_open(dialog, layer, feature):
       </conditionalstyles>
       <defaults>
         <default field="ID" expression=""/>
+        <default field="Megnevezes" expression=""/>
         <default field="REGIUNE" expression=""/>
         <default field="SUBREGIUNE" expression=""/>
         <default field="GRUPAUNIT5" expression=""/>
@@ -678,7 +679,6 @@ def my_form_open(dialog, layer, feature):
         <default field="UNIT6GRUP7" expression=""/>
         <default field="UNIT_ORD_7" expression=""/>
         <default field="Terulet" expression=""/>
-        <default field="DENUMIRE" expression=""/>
       </defaults>
     </maplayer>
   </projectlayers>
