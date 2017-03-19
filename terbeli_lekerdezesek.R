@@ -224,7 +224,8 @@ dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam
   
   #honaponkenti fajok szama regionkent 
   aktivi2 <- unlist(lapply(regi_fl, function(x) {
-                      d1 <- unique(x$fajok[,c(5, 13)])
+                      d1 <- data.frame(d = month(x$fajok$datum), f = x$fajok$sp)
+                      d1 <- unique(d1[,c(1,2)])
                       d <- numeric(12)
                       for (i in 1:length(d1[,2])) {
                         d[month(d1[i, 1])] <- d[month(d1[i, 1])] + 1
