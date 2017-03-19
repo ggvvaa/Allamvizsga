@@ -203,7 +203,7 @@ dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam
   
   
   
-  #honaponkenti gyujtesek szamanak lekerdezese regionkent
+  #honaponkenti gyujtesi napok szama regionkent
   aktivi1 <- unlist(lapply(regi_fl, function(x) {
                       d1 <- unique(x$fajok$datum)
                       d <- numeric(12)
@@ -246,22 +246,43 @@ dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam
   #aa <- ddply(regi_fl[[2]]$fajok, .(sp), nrow)
   ef <- unique(dat[,6:13])
   ef_m <- unlist(lapply(regi_fl, function(x) {
-    d <- ddply(x$fajok, .(sp), nrow)
-    d1 <- matrix(rep(0, nrow(ef)), nrow = 1)
-    colnames(d1) <- ef$sp
-    if (length(d$sp) != 0) {
-      for (i in 1:length(d$sp)) {
-        d1[1,paste(d$sp[i])] <- d$V1[i]
-      }
-    }
-    return(d1)
-  }))
-  
+                    d <- ddply(x$fajok, .(sp), nrow)
+                    d1 <- matrix(rep(0, nrow(ef)), nrow = 1)
+                    colnames(d1) <- ef$sp
+                    if (length(d$sp) != 0) {
+                      for (i in 1:length(d$sp)) {
+                        d1[1,paste(d$sp[i])] <- d$V1[i]
+                      }
+                    }
+                    return(d1)
+                  }))
+                  
   
   
   ef_m <- matrix(ef_m, ncol = length(ef$sp), byrow = T)
   colnames(ef_m) <- paste(ef$fam, ' ', ef$subfam, ' ', ef$gen, ' ', ef$subgen, ' ', ef$spec, ' ', ef$subspec)
   rownames(ef_m) <- nevek
+  
+  
+  
+  #fajok szerinti gyujtott egyedek szama 
+  ef <- unique(dat[,6:13])
+  aktivi3 <- unlist(lapply(regi_fl, function(x) {
+                      d1 <- matrix(rep(0, nrow(ef)), nrow = 1)
+                      colnames(d1) <- ef$sp
+                      if (length(x$fajok$sp) != 0) {
+                        for (i in 1:length(x$fajok$sp)) {
+                          d1[1,paste(x$fajok$sp[i])] <- d1[1,paste(x$fajok$sp[i])] + x$fajok[i,]$egyed
+                        }
+                      }
+                      return(d1)
+                    }))
+                    
+  
+  
+  aktivitas3 <- matrix(aktivi3, ncol = length(ef$sp), byrow = T)
+  colnames(aktivitas3) <- paste(ef$fam, ' ', ef$subfam, ' ', ef$gen, ' ', ef$subgen, ' ', ef$spec, ' ', ef$subspec)
+  rownames(aktivitas3) <- nevek
 } #tabalzatok lekerdezesek
 
 
@@ -275,9 +296,10 @@ dat <- data.frame(id = id, lon = lo, lat = la, egyed = egyed, datum = datum, fam
   }
   write.xlsx(df, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Regionkenti adatok', append = TRUE, showNA = F)
   write.xlsx(aktivitas, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkent gyujtott egyedek', append = TRUE, showNA = F)
-  write.xlsx(aktivitas1, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti gyujtesi alkalmak', append = TRUE, showNA = F)
-  write.xlsx(aktivitas2, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti befogott fajok', append = TRUE, showNA = F)
+  write.xlsx(aktivitas1, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti gyujtesi napok szama', append = TRUE, showNA = F)
+  write.xlsx(aktivitas2, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Honaponkenti fajok szama', append = TRUE, showNA = F)
   write.xlsx(ef_m, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Fajok szerinti gyujtese szama', append = TRUE, showNA = F)
+  write.xlsx(aktivitas3, file = "tipulidae_eredmenyek.xlsx", sheetName = 'Fajok szerinti gyujtott egyedek szama', append = TRUE, showNA = F)
 } #exportalas
 
 
