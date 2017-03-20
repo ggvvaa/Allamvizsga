@@ -11,7 +11,7 @@ library(lubridate) #datumok
 library(xlsx)
 library(plyr) #duplikalt adat szamolas
 library(reshape2) #kel a braplot abrazolashoz
-
+library(vegan) #diverzitasi indexek
 
 
 #1
@@ -145,9 +145,9 @@ library(reshape2) #kel a braplot abrazolashoz
       regi_f <- fortify(eval(as.name(paste(asd[i]))))
       nPolys <- unique(regi_f$id) #a kulombozo regioknak az azonositoi, osszesen 16
       regi_fl = list()
-      nevek <- numeric(length(nPolys))
+      nevek <- character(length(nPolys))
       for (k in 1:length(nPolys)) {
-        nevek[k] <- as.character(regi$Megnevezes[k])
+        nevek[k] <- as.character(eval(as.name(paste(asd[i])))$Megnevezes[k])
       }
 
       
@@ -296,6 +296,24 @@ library(reshape2) #kel a braplot abrazolashoz
     
     
     
+    #10
+    {
+      shannon <- diversity(aktivitas3)
+      simpson <- diversity(aktivitas3, "simp")
+      fisher <- fisher.alpha(aktivitas3)
+      evenness <- shannon/log(specnumber(aktivitas3),base = 2)
+      dominance <- 1 - simpson
+      
+      
+      
+      index <- matrix(c(shannon, simpson, fisher, evenness, dominance), ncol = length(shannon), byrow = T)
+      index <- data.frame(index)
+      colnames(index) <- nevek
+      rownames(index) <- c('shannon', 'simpson', 'fisher', 'evenness', 'dominance')
+    } #diverzitas indexek
+    
+    
+    
     #7
     {
       for (j in 1:length(nPolys)) {
@@ -309,6 +327,7 @@ library(reshape2) #kel a braplot abrazolashoz
       write.xlsx(aktivitas2, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Honaponkenti fajok szama', append = TRUE, showNA = F)
       write.xlsx(ef_m, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Fajok szerinti gyujtese szama', append = TRUE, showNA = F)
       write.xlsx(aktivitas3, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Fajok szerinti gyujtott egyedek szama', append = TRUE, showNA = F)
+      write.xlsx(index, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Diverzitasi indexek', append = TRUE, showNA = F)
     } #exportalas 
   }
 } #tabalzatok elkeszitese
@@ -351,3 +370,15 @@ library(reshape2) #kel a braplot abrazolashoz
     geom_line(data = r_su, aes(x = Var2, y = value, group = Var1, color = factor(Var2))) + 
     guides(colour=FALSE)
 } #plot - oks
+
+
+
+# dist_m <- dist(aktivitas3, method = "euclidean")
+# fit <- hclust(dist_m, method="ward.D")
+# plot(fit)
+# 
+# 
+# correl <- cor(t(aktivitas3[c(1,2,4,5,6,7),]), method = 'pearson')
+# dist_m <- as.dist(1 - correl)
+# fit <- hclust(dist_m)
+# plot(fit)
