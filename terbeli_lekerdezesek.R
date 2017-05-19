@@ -1,21 +1,22 @@
 library(obm)
 library(rgdal)
-library(rgdal)
 library(rgeos)
 library(sp)
 library(readxl)
 library(maptools)
-library(rgdal)
 library(ggplot2)
 library(lubridate) #datumok
 library(xlsx)
 library(plyr) #duplikalt adat szamolas
 library(reshape2) #kel a braplot abrazolashoz
 library(vegan) #diverzitasi indexek
+library(RQGIS)
+
 
 
 #1
 {
+  setwd('/home/robi/Allamvizsga/')
   OBM_init('transdiptera')
   tokeRn <- OBM_auth('veres_robi75@yahoo.com', '123456')
   t_data <- OBM_get('get_data', '*')
@@ -26,8 +27,8 @@ library(vegan) #diverzitasi indexek
   
   rom <- readOGR("/home/robi/Allamvizsga/Qgis/Subregiune/Romania_teljes.shp", layer = "Romania_teljes")
   tipuloidae <- read_excel("~/Allamvizsga/Fajlista_teljes.xlsx", sheet = "Tipulidae")
-  regi <- readOGR("/home/robi/Allamvizsga/Qgis/Regiune/Regiune.shp", layer = "Regiune")
-  uj_regi <- readOGR("/home/robi/Allamvizsga/Qgis/uj regio hatarok/2.shp")
+  fold_regi <- readOGR("/home/robi/Allamvizsga/Qgis/Regiune/Regiune.shp", layer = "Regiune")
+  fajk_regi <- readOGR("/home/robi/Allamvizsga/Qgis/fajkepzodesi_kozpontok/fajkepzodesi_kozpontok.shx", layer = "fajkepzodesi_kozpontok")
   
   
   id <- unlist(t_data$obm_id)
@@ -99,8 +100,8 @@ library(vegan) #diverzitasi indexek
 
 #5
 {
-  centroids <- data.frame(gCentroid(regi, byid = TRUE))
-  centroids$regiune <- regi$REGIUNE
+  centroids <- data.frame(gCentroid(fold_regi, byid = TRUE))
+  centroids$regiune <- fold_regi$REGIUNE
   s <-
     c(
       'podis' ,
@@ -132,7 +133,7 @@ library(vegan) #diverzitasi indexek
 
 #8
 {
-  asd <- c('regi', 'uj_regi')
+  asd <- c('fold_regi', 'fajk_regi')
   #eval(as.name(paste(asd[i])))
   #lehet olyat is csinalni hogy eval(as.name(paste(asd[1])))[[2]]$adatok
   
@@ -161,9 +162,9 @@ library(vegan) #diverzitasi indexek
           }
         }
         fajok <- dat[-new_shape_2,]
-        corr <- length(unique(fajok$sp))/((regi$Terulet[l]/1000)^0.15) #a terulet milyen formaba szerepeljen?
+        corr <- round(length(unique(fajok$sp))/((eval(as.name(paste(asd[i])))$Terulet[l]/1000)^0.15), digits = 0) #a terulet milyen formaba szerepeljen?
         regi_fl[[l]] <- list(adatok = data.frame(nev = nevek[l], 
-                                                 terulet = regi$Terulet[l], 
+                                                 terulet = eval(as.name(paste(asd[i])))$Terulet[l], 
                                                  telj_fsz = length(unique(fajok$sp)), 
                                                  corr_fsz = corr,
                                                  gyujtesi_pontok_sz = nrow(unique(fajok[,c('lon', 'lat')])),
@@ -322,6 +323,7 @@ library(vegan) #diverzitasi indexek
         }
       }
       write.xlsx(df, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Regionkenti adatok', append = TRUE, showNA = F)
+      write.csv(df, file = paste("adatok_", paste(asd[i]), ".csv", sep = ""), na = '')
       write.xlsx(aktivitas, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Honaponkent gyujtott egyedek', append = TRUE, showNA = F)
       write.xlsx(aktivitas1, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Honaponkenti gyujtesi napok szama', append = TRUE, showNA = F)
       write.xlsx(aktivitas2, file = paste("tipulidae_eredmenyek_", paste(asd[i]), ".xlsx", sep = ""), sheetName = 'Honaponkenti fajok szama', append = TRUE, showNA = F)
@@ -337,23 +339,28 @@ library(vegan) #diverzitasi indexek
 #9
 {
   #pontok regionkenti kirajzolasa
-  for (i in 1:length(regi_fl)) {
+  for (o in 1:length(regi_fl)) {
     print(
       ggplot() + 
-        scale_x_continuous(name="") +
-        scale_y_continuous(name="") +
-        geom_polygon(data = regi, aes(long, lat, group = group), colour = 'black', fill = 'white') + 
-        geom_point(data = regi_fl[[i]][[2]],  aes(x = lon, y = lat), color = 'red', size = 2) + 
-        ggtitle(regi_fl[[i]]$adatok$nev)
+        scale_x_continuous(name = "") +
+        scale_y_continuous(name = "") +
+        geom_polygon(data = eval(as.name(paste(asd[i]))), aes(long, lat, group = group), colour = 'black', fill = 'white') + 
+        geom_point(data = regi_fl[[o]][[2]],  aes(x = lon, y = lat), color = 'red', size = 2) + 
+        ggtitle(regi_fl[[o]]$adatok$nev)
     )
   } 
   
   
   
   #romaniaban talalhato pntok kirajzolasa
-  ggplot() + 
-    geom_polygon(data = regi, aes(long, lat, group=group), colour='black',fill='white') + 
-    geom_point(data=dat, aes(x=lon, y=lat), color='red',size=2)
+  print(
+    ggplot() + 
+      scale_x_continuous(name = "") +
+      scale_y_continuous(name = "") +
+      geom_polygon(data = eval(as.name(paste(asd[i]))), aes(long, lat, group = group), colour = 'black', fill = 'white') + 
+      geom_point(data = dat, aes(x = lon, y = lat), color = 'red', size = 2) +
+      theme(axis.text = element_text(size = 24))
+  )
   
   
   
@@ -364,21 +371,48 @@ library(vegan) #diverzitasi indexek
   r_su <- melt(su)
   
   
+  print(
+    ggplot() + 
+      labs(x = "Hónapok", y = "Egyedszám", size = 50) +
+      #geom_bar(data = r_aktivitas, aes(x = Var2, y = value, fill = factor(Var1)), stat = "identity", position = position_dodge(width=0.5), width = 0.3) +
+      geom_line(data = r_su, aes(x = Var2, y = value, group = Var1, color = factor(Var2)), size = 2) + 
+      geom_point(data = r_su, aes(x = Var2, y = value, group = Var1, color = factor(Var2)), size = 4) +
+      guides(colour = FALSE) +
+      theme(axis.text = element_text(size = 24), axis.title = element_text(size = 26, face = "bold"))
+  )
   
-  ggplot() + 
-    geom_bar(data = r_aktivitas, aes(x = Var2, y = value, fill = factor(Var1)), stat = "identity", position="dodge", width=1) +
-    geom_line(data = r_su, aes(x = Var2, y = value, group = Var1, color = factor(Var2))) + 
-    guides(colour=FALSE)
+  
+  
+  su2 <- matrix(as.integer(colSums(aktivitas1)), nrow = 1)
+  colnames(su2) <- honapok
+  r_su2 <- melt(su2)
+  
+  
+  print(
+    ggplot() + 
+      labs(x = "Hónapok", y = "Alkalmak száma", size = 50) +
+      #geom_bar(data = r_aktivitas, aes(x = Var2, y = value, fill = factor(Var1)), stat = "identity", position = position_dodge(width=0.5), width = 0.3) +
+      geom_line(data = r_su2, aes(x = Var2, y = value, group = Var1, color = factor(Var2)), size = 2) + 
+      geom_point(data = r_su2, aes(x = Var2, y = value, group = Var1, color = factor(Var2)), size = 4) +
+      guides(colour=FALSE) +
+      theme(axis.text = element_text(size = 24), axis.title = element_text(size = 26, face = "bold"))
+  )
+  
+  
+  print(
+    ggplot(r_aktivitas, aes(x = as.numeric(Var2), y = value, colour = Var1)) + 
+      geom_line() +
+      geom_point() +
+      facet_wrap(~ Var1)
+  )
 } #plot - oks
 
 
 
-# dist_m <- dist(aktivitas3, method = "euclidean")
+# dist_m <- dist(aktivitas3[c(1,2,4,5,6,7),], method = "euclidean")
 # fit <- hclust(dist_m, method="ward.D")
 # plot(fit)
 # 
 # 
-# correl <- cor(t(aktivitas3[c(1,2,4,5,6,7),]), method = 'pearson')
-# dist_m <- as.dist(1 - correl)
-# fit <- hclust(dist_m)
-# plot(fit)
+# 
+# plot(hclust(dist(abs(cor(t(aktivitas3[c(1,2,4,5,6,7),]))))))
